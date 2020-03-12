@@ -1,0 +1,9 @@
+#ansible-playbook netconf-backup.yml -i ./hosts
+# -f #forks (optional) means the # of processes to execute in parallel.
+# -l xxx limit the playbook to the specified hosts
+#
+# Comment the lines of the platform that you are not interested in backing up the device configuration files
+---
+- import_playbook: playbooks/netconf-backup-ios.yml
+- import_playbook: playbooks/netconf-backup-asa.yml
+- import_playbook: playbooks/netconf-backup-f5.yml

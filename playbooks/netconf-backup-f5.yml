@@ -1,0 +1,90 @@
+# ansible-playbook netconf-backup.yml
+# -f #forks (optional) means the # of processes to execute in parallel.
+# -l xxx limit the playbook to the specified hosts
+---
+- name: F5 - Network configuration backup
+  hosts: all
+  gather_facts: false
+  # By default Ansible won't start a new task group until the previous one in fully completed for all the hosts.
+  # With strategy free you can ask to continue with all the tasks per host without waiting. And limited in this
+  # case by the number of forks.
+  # The downside is that the output to screen sequence will be messy. Once you know
+  # that the playbook works fine, then enable strategy free to real speed up the whole playbook execution.
+  #
+  # strategy: free
+
+  vars:
+    - errors: ""
+    - provider:
+        server: "{{ ansible_host }}"
+        user: "{{ f5_user }}"
+        password: "{{ f5_pass }}"
+        validate_certs: no
+
+  tasks:
+
+    - name: Save Config
+      bigip_config:
+        provider: "{{ provider }}"
+        save: true
+      delegate_to: localhost
+      register: output_save
+      ignore_errors: yes
+      when: ansible_network_os == 'f5'
+
+    - name: Collect error info "Save Config"
+      set_fact:
+        errors: "- Save Config: {{ output_save.msg }}\n"
+      when: ansible_network_os == 'f5' and output_save.msg is defined
+
+    - name: Create UCS
+      bigip_command:
+        provider: "{{ provider }}"
+        commands:
+           - "save sys ucs backup.ucs"
+      delegate_to: localhost
+      register: output_create
+      ignore_errors: yes
+      when: ansible_network_os == 'f5'
+
+    - name: Collect error info "Create UCS"
+      set_fact:
+        errors: "{{ errors }}\n- Create UCS: {{ output_create.msg }}\n"
+      when: ansible_network_os == 'f5' and output_create.msg is defined
+
+    - name: Download the new UCS
+      bigip_ucs_fetch:
+        src: backup.ucs
+        dest: ../backup/backup.ucs
+        provider: "{{ provider }}"
+      delegate_to: localhost
+      register: output_download
+      ignore_errors: yes
+      when: ansible_network_os == 'f5'
+
+    - name: Collect error info "Download the new UCS"
+      set_fact:
+        errors: "{{ errors }}\n- Download SCF: {{ output_download.msg }}\n"
+      when: ansible_network_os == 'f5' and output_download.msg is defined
+
+    - name: F5 - Change filename or delete if identical to previous backup file
+      command:
+        argv:
+          - python3
+          - scripts/netconf-backup-f5.py
+          - "{{ inventory_hostname }}"
+      delegate_to: localhost
+      when: ansible_network_os == 'f5' and output_save.failed == false and output_create.failed == false and output_download.failed == false
+
+    - name: F5 - Sending an e-mail if host backup failed
+      mail:
+        host: smtp.xxx.com
+        port: 587
+        sender: xxx@yyy
+        username: xxx@yyy
+        password: xxx
+        to: xxx@yyy
+        subject: Configuration backup failed on host {{ inventory_hostname }}
+        body: "Error message: \n{{ errors }}"
+      delegate_to: localhost
+      when: ansible_network_os == 'f5' and (output_save.failed == true or output_create.failed == true or output_download.failed == true)
