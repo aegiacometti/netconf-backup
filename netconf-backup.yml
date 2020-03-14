@@ -1,9 +1,38 @@
-#ansible-playbook netconf-backup.yml -i ./hosts
+# ansible-playbook netconf-backup.yml -i ./hosts
 # -f #forks (optional) means the # of processes to execute in parallel.
 # -l xxx limit the playbook to the specified hosts
 #
-# Comment the lines of the platform that you are not interested in backing up the device configuration files
 ---
-- import_playbook: playbooks/netconf-backup-ios.yml
-- import_playbook: playbooks/netconf-backup-asa.yml
-- import_playbook: playbooks/netconf-backup-f5.yml
+- name: Network configuration backup
+  hosts: all
+  gather_facts: false
+
+  # By default Ansible won't start a new task group until the previous one in fully completed for all the hosts.
+  # With strategy free you can ask to continue with all the tasks per host without waiting. And limited in this
+  # case by the number of forks.
+  # The downside is that the output to screen of the execution of the Playbook will be messy, so if you have an
+  # error comment the line "strategy: free" in order to ease the debug.
+  #
+  strategy: free
+
+  # Set to yes/no the following variables in order to get the alerts
+  vars:
+    alert_mail: "yes"
+    alert_slack: "yes"
+    historic_files_to_keep: 10
+
+  # Comment/delete the tasks of the platform that you are not interested in backing up the device configuration files
+  tasks:
+    - name: Cisco IOS
+      connection: network_cli
+      import_tasks: playbooks/netconf-backup-ios.yml
+      when: platform == 'ios'
+
+    - name: Cisco ASA
+      connection: network_cli
+      import_tasks: playbooks/netconf-backup-asa.yml
+      when: platform == 'asa'
+
+    - name: F5
+      import_tasks: playbooks/netconf-backup-f5.yml
+      when: platform == 'f5'

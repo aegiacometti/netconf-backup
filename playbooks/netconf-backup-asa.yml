@@ -1,47 +1,32 @@
-# ansible-playbook netconf-backup.yml
-# -f #forks (optional) means the # of processes to execute in parallel.
-# -l xxx limit the playbook to the specified hosts
----
-- name: Cisco ASA - Network configuration backup
-  hosts: all
-  gather_facts: false
-  connection: network_cli
-  # By default Ansible won't start a new task group until the previous one in fully completed for all the hosts.
-  # With strategy free you can ask to continue with all the tasks per host without waiting. And limited in this
-  # case by the number of forks.
-  # The downside is that the output to screen sequence will be messy. Once you know
-  # that the playbook works fine, then enable strategy free to real speed up the whole playbook execution.
-  #
-  # strategy: free
+- name: Cisco ASA - show running-config
+  asa_command:
+    commands: 'show running-config'
+  register: output
+  ignore_errors: yes
 
-  tasks:
+- name: Cisco ASA - Save the output
+  command:
+    argv:
+      - python3
+      - scripts/netconf-backup.py
+      - "{{ inventory_hostname }}"
+      - "{{ output.stdout[0] }}"
+      - "{{ historic_files_to_keep }}"
+  delegate_to: localhost
+  when: output.failed == false
 
-    - name: Cisco ASA - show running-config
-      asa_command:
-        commands: 'show running-config'
-      register: output_asa
-      ignore_errors: yes
-      when: ansible_network_os == 'asa'
+- name: Cisco ASA - Send Mail alert if host backup failed
+  vars:
+    os: "Cisco ASA"
+    output:
+      msg: "{{output.module_stderr}}"
+  import_tasks: netconf-backup-send-mail.yml
+  when: output.failed == true and alert_mail == "yes"
 
-    - name: Cisco ASA - Save the output
-      command:
-        argv:
-          - python3
-          - scripts/netconf-backup.py
-          - "{{ inventory_hostname }}"
-          - "{{ output_asa.stdout[0] }}"
-      delegate_to: localhost
-      when: ansible_network_os == 'asa' and output_asa.failed == false
-
-    - name: Cisco ASA - Sending an e-mail if host backup failed
-      mail:
-        host: smtp.xxx.com
-        port: 587
-        sender: xxx@yyy
-        username: xxx@yyy
-        password: xxx
-        to: xxx@yyy
-        subject: Configuration backup failed on host {{ inventory_hostname }}
-        body: "Error message: {{ output_asa.msg }}"
-      delegate_to: localhost
-      when: ansible_network_os == 'asa' and output_asa.failed == true
+- name: Cisco IOS - Send Slack alert if host backup failed
+  vars:
+    os: "Cisco ASA"
+    output:
+      msg: "{{output.module_stderr}}"
+  import_tasks: netconf-backup-msg-slack.yml
+  when: output.failed == true and alert_slack == "yes"

@@ -1,0 +1,10 @@
+- name: "{{ os }} - Send Mail if host backup failed"
+  mail:
+    host: smtp.live.com
+    port: 587
+    sender: aegiacometti@hotmail.com
+    username: aegiacometti@hotmail.com
+    password: M41l.hotmail
+    to: aegiacometti@hotmail.com
+    subject: Configuration backup failed on host "{{ inventory_hostname }}"
+  delegate_to: localhost
