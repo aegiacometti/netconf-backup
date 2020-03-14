@@ -9,7 +9,7 @@ historic_files_to_keep = sys.argv[3]
 
 
 def remove_old_files():
-    list_files = glob.glob('./backup/{}*'.format(device_hostname))
+    list_files = glob.glob('./backups/{}*'.format(device_hostname))
 
     if len(list_files) >= int(historic_files_to_keep):
         list_files.sort()
@@ -18,7 +18,7 @@ def remove_old_files():
 
 
 def search_changed_config_file():
-    list_files = glob.glob('./backup/{}*'.format(device_hostname))
+    list_files = glob.glob('./backups/{}*'.format(device_hostname))
 
     if len(list_files) == 0:
         return True
@@ -35,7 +35,7 @@ def save_file():
     get_date = time.localtime()
     current_date = time.strftime('%Y-%m-%d-%H-%M-%S', get_date)
 
-    filename = './backup/{}-{}.cfg'.format(device_hostname, current_date)
+    filename = './backups/{}-{}.cfg'.format(device_hostname, current_date)
     file = open(filename, 'w')
     file.write(output)
     file.close()

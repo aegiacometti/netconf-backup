@@ -27,7 +27,7 @@
 - name: Download the new UCS
   bigip_ucs_fetch:
     src: backup.ucs
-    dest: ./backup/backup.ucs
+    dest: ./backups/backup.ucs
     provider:
       server: "{{ ansible_host }}"
       user: "{{ f5_user }}"

@@ -1,10 +1,9 @@
 [network]
-#isp-pe ansible_host=10.0.0.1 ansible_network_os=ios ansible_user=cisco ansible_password=cisco platform=ios
-#hq-core ansible_host=10.0.12.2 ansible_network_os=ios ansible_user=cisco ansible_password=cisco platform=ios
-#isp-internet ansible_host=10.0.14.2 ansible_network_os=ios ansible_user=cisco ansible_password=cisco platform=ios
+isp-internet ansible_host=10.0.14.2 ansible_network_os=ios ansible_user=cisco ansible_password=cisco platform=ios
+hq-core ansible_host=10.0.12.2 ansible_network_os=nxos ansible_user=cisco ansible_password=cisco platform=nxos
 
 [firewall]
-#vpn-bkp ansible_host=10.100.10.1 ansible_network_os=asa ansible_user=cisco ansible_password=cisco ansible_become=yes ansible_become_method=enable ansible_become_pass=cisco platform=asa
+vpn-bkp ansible_host=10.100.10.1 ansible_network_os=asa ansible_user=cisco ansible_password=cisco ansible_become=yes ansible_become_method=enable ansible_become_pass=cisco platform=asa
 
 [f5]
-f5-bigip ansible_host=10.100.201.51 f5_user=admin f5_pass=adr00gia platform=f5
+f5-bigip ansible_host=10.100.201.51 f5_user=admin f5_pass=default platform=f5

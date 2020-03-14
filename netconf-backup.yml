@@ -17,8 +17,8 @@
 
   # Set to yes/no the following variables in order to get the alerts
   vars:
-    alert_mail: "yes"
-    alert_slack: "yes"
+    alert_mail: "no"
+    alert_slack: "no"
     historic_files_to_keep: 10
 
   # Comment/delete the tasks of the platform that you are not interested in backing up the device configuration files
@@ -27,6 +27,11 @@
       connection: network_cli
       import_tasks: playbooks/netconf-backup-ios.yml
       when: platform == 'ios'
+
+    - name: Cisco NxOS
+      connection: network_cli
+      import_tasks: playbooks/netconf-backup-ios.yml
+      when: platform == 'nxos'
 
     - name: Cisco ASA
       connection: network_cli
