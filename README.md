@@ -33,3 +33,4 @@ Run the master Playbook with: ``ansible-playbook netconf-backup.yml``
 "alert_mail" and/or "alert_slack" at the master Playbook ``netconfig-backup.yml``. And set your mail details and/or Slack webhook at the
 playbooks ``netconfig-backup-send-mail.yml`` and/or ``netconfig-backup-msg-slack.yml``
 
+- Add periodic execution via ``crontab -e``.
