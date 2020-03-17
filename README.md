@@ -45,23 +45,24 @@ two configurations to add to your Linux.
 - Depending on the OS of your network devices you might need to enable other SSH parameters.
 lines with ``sudo vi /etc/ssh/ssh_config``.
 
-  
-    #Legacy changes
-        KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp5 21,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-        Ciphers aes128-cbc,aes128-ctr,aes256-ctr
-    
+``` 
+#Legacy changes
+KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp5 21,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers aes128-cbc,aes128-ctr,aes256-ctr
+```
+
 - On the Ansible side, analyse the addition of these two parameters in your ``.ansible.cfg``.
 
+```
+[defaults]
+# uncomment this to disable SSH key host checking
+host_key_checking = False
 
-    [defaults]
-    # uncomment this to disable SSH key host checking
-    host_key_checking = False
-    
-    [paramiko_connection]
-    # When using persistent connections with Paramiko, the connection runs in a
-    # background process.  If the host doesn't already have a valid SSH key, by
-    # default Ansible will prompt to add the host key.  This will cause connections
-    # running in background processes to fail.  Uncomment this line to have
-    # Paramiko automatically add host keys.
-    host_key_auto_add = True
-
+[paramiko_connection]
+# When using persistent connections with Paramiko, the connection runs in a
+# background process.  If the host doesn't already have a valid SSH key, by
+# default Ansible will prompt to add the host key.  This will cause connections
+# running in background processes to fail.  Uncomment this line to have
+# Paramiko automatically add host keys.
+host_key_auto_add = True
+```
