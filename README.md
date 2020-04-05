@@ -1,4 +1,4 @@
-# Simple configuration backup for Cisco IOS, NxOS, ASA and F5
+# Simple configuration backup for Cisco IOS, NxOS, ASA, Arista and F5
 
 Simple and complete backup setup with Ansible and Python3.
  

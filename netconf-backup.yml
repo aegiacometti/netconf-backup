@@ -38,6 +38,11 @@
       import_tasks: playbooks/netconf-backup-asa.yml
       when: platform == 'asa'
 
+    - name: Arista
+      connection: network_cli
+      import_tasks: playbooks/netconf-backup-asa.yml
+      when: platform == 'eos'
+
     - name: F5
       import_tasks: playbooks/netconf-backup-f5.yml
       when: platform == 'f5'

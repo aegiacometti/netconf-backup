@@ -1,0 +1,28 @@
+- name: Arista - show running-config
+  eos_command:
+    commands: 'show running-config'
+  register: output
+  ignore_errors: yes
+
+- name: Arista - Save the output
+  command:
+    argv:
+      - python3
+      - scripts/netconf-backup.py
+      - "{{ inventory_hostname }}"
+      - "{{ output.stdout[0] }}"
+      - "{{ historic_files_to_keep }}"
+  delegate_to: localhost
+  when: output.failed == false
+
+- name: Arista - Send Mail alert if host backup failed
+  vars:
+    os: "Arista"
+  import_tasks: netconf-backup-send-mail.yml
+  when: output.failed == true and alert_mail == "yes"
+
+- name: Arista - Send Slack alert if host backup failed
+  vars:
+    os: "Arista"
+  import_tasks: netconf-backup-msg-slack.yml
+  when: output.failed == true and alert_slack == "yes"
