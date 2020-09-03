@@ -1,0 +1,27 @@
+- name: FortiOS SCP - Get config
+  command:
+    argv:
+      - python3
+      - scripts/get-FortiOS-Config.py
+      - "{{ ansible_host }}"
+      - "{{ ansible_user }}"
+      - "{{ ansible_password}}"
+      - "{{ file_name }}"
+      - "{{ backup_dir }}"
+  delegate_to: localhost
+  register: output_fortios
+  ignore_errors: yes
+
+- name: FortiOS - Process the file
+  command:
+    argv:
+      - python3
+      - scripts/netconf-backup.py
+      - "{{ inventory_hostname }}"
+      - "{{ file_name }}"
+      - "{{ backup_dir }}"
+      - "{{ keep_local_history }}"
+      - "{{ historic_files_to_keep }}"
+  delegate_to: localhost
+  when: output_fortios.stdout == "ok"
+  ignore_errors: yes

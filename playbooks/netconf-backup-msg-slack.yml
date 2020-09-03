@@ -1,5 +1,0 @@
-- name: "{{ os }} - Sending message to Slack if host backup failed"
-  slack:
-    token: xxx/yyy/zzz
-    msg: '`Configuration backup failed on host "{{ inventory_hostname }}"`'
-  delegate_to: localhost

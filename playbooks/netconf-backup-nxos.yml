@@ -7,24 +7,17 @@
 - name: Cisco NxOS - Save the output
   vars:
     clean_config: "{{ output.stdout[0]|clean_config(clean_patterns) }}"
+  local_action: copy content={{clean_config}} dest={{backup_dir}}/{{file_name}}
+
+- name: Cisco NxOS - Process the file
   command:
     argv:
       - python3
       - scripts/netconf-backup.py
       - "{{ inventory_hostname }}"
-      - "{{ clean_config }}"
+      - "{{ file_name }}"
+      - "{{ backup_dir }}"
+      - "{{ keep_local_history }}"
       - "{{ historic_files_to_keep }}"
   delegate_to: localhost
   when: output.failed == false
-
-- name: Cisco NxOS - Send Mail alert if host backup failed
-  vars:
-    os: "Cisco NxOS"
-  import_tasks: netconf-backup-send-mail.yml
-  when: output.failed == true and alert_mail == "yes"
-
-- name: Cisco NxOS - Send Slack alert if host backup failed
-  vars:
-    os: "Cisco NxOS"
-  import_tasks: netconf-backup-msg-slack.yml
-  when: output.failed == true and alert_slack == "yes"
