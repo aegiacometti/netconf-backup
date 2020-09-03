@@ -25,3 +25,17 @@
   delegate_to: localhost
   when: output_fortios.stdout == "ok"
   ignore_errors: yes
+
+- name: FortiOS - Send Mail alert if host backup failed
+  vars:
+    os: "FortiOS"
+    step: "fail"
+  import_tasks: netconf-backup-send-mail.yml
+  when: output_fortios.stdout != "ok" and alert_mail == "yes"
+
+- name: FortiOS - Send Slack alert if host backup failed
+  vars:
+    os: "FortiOS"
+    step: "fail"
+  import_tasks: netconf-backup-msg-slack.yml
+  when: output_fortios.stdout != "ok" and alert_slack == "yes"

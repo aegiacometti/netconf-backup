@@ -32,7 +32,7 @@ Run the master Playbook with: ``ansible-playbook netconf-backup.yml``
 
 - If you want the alerts to be sent when a configuration backup fail, set to **"yes"** the variables 
 "alert_mail" and/or "alert_slack" at the master Playbook ``netconfig-backup.yml``. And set your mail details and/or Slack webhook at the
-playbooks ``netconfig-backup-send-mail.yml`` and/or ``netconfig-backup-msg-slack.yml``
+file ``group_vars/all.yml``
 
 - Add periodic execution via ``crontab -e``.
 

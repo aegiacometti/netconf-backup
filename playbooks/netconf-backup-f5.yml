@@ -49,3 +49,17 @@
       - "{{ historic_files_to_keep }}"
   delegate_to: localhost
   when: output_save.failed == false and output_create.failed == false and output_download.failed == false
+
+- name: F5 - Send Mail alert if host backup failed
+  vars:
+    os: "F5"
+    partial: "yes"
+  import_tasks: netconf-backup-send-mail.yml
+  when: (output_save.failed == true or output_create.failed == true or output_download.failed == true) and alert_mail == "yes"
+
+- name: F5 - Send Slack alert if host backup failed
+  vars:
+    os: "F5"
+    partial: "yes"
+  import_tasks: netconf-backup-msg-slack.yml
+  when: (output_save.failed == true or output_create.failed == true or output_download.failed == true) and alert_slack == "yes"

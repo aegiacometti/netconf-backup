@@ -1,0 +1,13 @@
+- name: "{{ os }} - Sending message to Slack if host backup failed"
+  slack:
+    token: "{{ slack_webhook }}"
+    msg: '`Configuration backup failed on host "{{ inventory_hostname }}"`'
+  delegate_to: localhost
+  when: step == "fail"
+
+- name: Slack Message - Network configuration backup finished
+  slack:
+    token: "{{ slack_webhook }}"
+    msg: '```Network configuration backup finished```'
+  delegate_to: localhost
+  when: step == "finished"

@@ -20,6 +20,13 @@
     keep_local_history: "yes"
     historic_files_to_keep: 10
 
+    alert_slack: "no"
+
+    alert_mail: "no"
+    mail_host: smtp.xxx.com
+    mail_port: 587
+    mail_to: support@xxx.com
+
     clean_patterns:
     - "\\A[^!]*"
     - "ntp clock-period..."
@@ -55,3 +62,17 @@
     - name: FortiOS
       import_tasks: playbooks/netconf-backup-fortios.yml
       when: platform == 'fortios'
+
+    - name: Send executed backup notification to Slack
+      vars:
+        step: "finished"
+      import_tasks: playbooks/netconf-backup-msg-slack.yml
+      when: alert_slack == "yes"
+      run_once: true
+
+    - name: Send executed backup notification by email
+      vars:
+        step: "finished"
+      import_tasks: playbooks/netconf-backup-send-mail.yml
+      when: alert_mail == "yes"
+      run_once: true

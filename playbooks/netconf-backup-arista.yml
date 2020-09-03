@@ -21,3 +21,17 @@
       - "{{ historic_files_to_keep }}"
   delegate_to: localhost
   when: output.failed == false
+
+- name: Arista - Send Mail alert if host backup failed
+  vars:
+    os: "Arista"
+    partial: "yes"
+  import_tasks: netconf-backup-send-mail.yml
+  when: output.failed == true and alert_mail == "yes"
+
+- name: Arista - Send Slack alert if host backup failed
+  vars:
+    os: "Arista"
+    partial: "yes"
+  import_tasks: netconf-backup-msg-slack.yml
+  when: output.failed == true and alert_slack == "yes"
