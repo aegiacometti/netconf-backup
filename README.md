@@ -18,7 +18,12 @@ Simple and complete backup setup with Ansible and Python3.
 
 ## Setup
 Customize the ``hosts`` file according to your needs. *(Sample file provided)*.
+
 Pay special attention to setup the ``platform=xxx`` value of each host.
+
+According the groups you defined in the ``hosts`` file, create files with the exact name at the directory ``./group_vars``. *(Sample file provided)*.
+
+Inside those file specify your devices credentials.
 
 ## Usage
 
